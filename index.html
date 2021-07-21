@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="header">
+      <img src="images/Phasmophobia_Logo.webp" alt="Phasmophobia_Logo" />
+      <h1>Evidence Tracker</h1>
+    </div>
+    <div class="content">
+      <div class="ghost-details">
+        <input type="text" name="Ghost Name" id="ghost_name" placeholder="Ghost Name" />
+        <input
+          type="button"
+          name="Shy"
+          id="ghost_shy"
+          value="Shy Ghost (alone)"
+          onclick="changeShyness()"
+        />
+        <input type="checkbox" name="Ghost Tips" id="ghost_tips" />
+        <label for="ghost_tips">Show Ghost Specific Tips</label>
+      </div>
+      <div class="ghosts" id="ghost_types"></div>
+    </div>
+  </body>
+  <script src="index.js"></script>
+</html>
