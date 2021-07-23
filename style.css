@@ -1,6 +1,11 @@
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
   background-color: #030509;
+  height: 100%;
 }
 
 .header {
@@ -17,8 +22,48 @@ body {
   margin-right: 0.8em;
 }
 
-.ghost-details {
+.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.extras {
+  margin-top: auto;
+  margin-bottom: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.extras-container {
+  display: flex;
+}
+
+.extras div {
   color: #ffffff;
+}
+
+.extras .title {
+  font-size: 1.8em;
+}
+
+.extras .description {
+  font-size: 0.8em;
+  color: #cecece;
+}
+
+.ghost-details {
+  margin-right: 1em;
+  color: #ffffff;
+  display: flex;
+}
+
+.ghost-details input {
+  margin-left: 1em;
+}
+
+.ghost-details *:last-child {
+  margin-left: auto;
 }
 
 .ghosts {
@@ -26,7 +71,8 @@ body {
   flex-direction: row;
   flex-wrap: wrap;
   color: #ffffff;
-  margin: 1em;
+  margin-left: 1em;
+  margin-right: 1em;
 }
 
 .ghost {
@@ -63,4 +109,52 @@ body {
 
 .other {
   color: #ebf744;
+}
+
+.select-evidence {
+  margin: 1em;
+  display: flex;
+}
+
+.select-evidence div {
+  margin-right: 1em;
+  display: flex;
+}
+
+input[class='selected'] {
+  background-color: #28fa39;
+}
+
+input[class='disabled'] {
+  background-color: #fa2828;
+}
+
+.possible-evidence {
+  margin: 1em;
+  color: #ffffff;
+}
+
+.possible-evidence .evidence-title {
+  font-weight: bold;
+}
+
+.ghost.disabled {
+  display: none;
+}
+
+.evidence {
+  display: flex;
+}
+
+.evidence div {
+  margin-left: 0.5em;
+}
+
+.evidence div.selected {
+  color: #28fa39;
+}
+
+.evidence div::after {
+  content: ',';
+  color: #ffffff;
 }

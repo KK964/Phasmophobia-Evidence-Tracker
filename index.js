@@ -1,6 +1,15 @@
 var shy = true;
 var showTips = false;
 
+var evidenceSelections = {
+  box: 0,
+  fingers: 0,
+  writing: 0,
+  freezing: 0,
+  orb: 0,
+  emf: 0,
+};
+
 var evidenceTypes = {
   box: 'Spirit Box',
   fingers: 'Fingerprints',
@@ -79,9 +88,7 @@ const ghosts = {
 
 function changeShyness() {
   shy = !shy;
-  document.getElementById('ghost_shy').value = shy
-    ? 'Shy Ghost (alone)'
-    : 'Extrovert Ghost (everyone)';
+  updateEvidence();
 }
 
 function addGhostTypes() {
@@ -100,19 +107,143 @@ function addGhostTypes() {
 
     for (var details of Object.keys(ghostDetails)) {
       var detailValue = ghostDetails[details];
-      if (Array.isArray(detailValue)) {
-        detailValue = detailValue.map((value) => (value = evidenceTypes[value]));
-        detailValue = detailValue.join(', ');
-      }
       var detailElement = document.createElement('div');
       detailElement.classList.add('ghost-detail');
       detailElement.classList.add(details);
-      detailElement.innerHTML = capitalizeFirstLetter(details) + ': ' + detailValue;
+      if (Array.isArray(detailValue)) {
+        detailElement.innerHTML = 'Evidence: ';
+        for (var v of detailValue) {
+          var evidenceElement = document.createElement('div');
+          evidenceElement.classList.add('evidence_type');
+          evidenceElement.classList.add(v);
+          evidenceElement.innerHTML = evidenceTypes[v];
+          detailElement.appendChild(evidenceElement);
+        }
+      } else detailElement.innerHTML = capitalizeFirstLetter(details) + ': ' + detailValue;
       ghostElement.appendChild(detailElement);
     }
-
     ghostTypeContainer.appendChild(ghostElement);
   }
+}
+
+function addEvidenceTypes() {
+  var evidenceTypeContainer = document.getElementsByClassName('select-evidence')[0];
+  for (var evidence of Object.keys(evidenceSelections)) {
+    var evidenceElement = document.createElement('div');
+
+    var evidenceNameElement = document.createElement('input');
+    evidenceNameElement.type = 'button';
+    evidenceNameElement.id = `evidence_${evidence}`;
+    evidenceNameElement.value = capitalizeFirstLetter(evidenceTypes[evidence]);
+    var disableEvidenceElement = document.createElement('input');
+    disableEvidenceElement.type = 'button';
+    disableEvidenceElement.id = `evidence_${evidence}_disable`;
+    disableEvidenceElement.value = 'X';
+    evidenceElement.appendChild(evidenceNameElement);
+    evidenceElement.appendChild(disableEvidenceElement);
+    evidenceTypeContainer.appendChild(evidenceElement);
+    evidenceClickListeners(evidenceNameElement, disableEvidenceElement, evidence);
+  }
+}
+
+function evidenceClickListeners(selectedButton, disabledButton, evidence) {
+  selectedButton.addEventListener('click', () => {
+    if (evidenceSelections[evidence] === 0) evidenceSelections[evidence] = 1;
+    else evidenceSelections[evidence] = 0;
+    updateEvidence();
+  });
+
+  disabledButton.addEventListener('click', (e) => {
+    if (evidenceSelections[evidence] === -1) evidenceSelections[evidence] = 0;
+    else evidenceSelections[evidence] = -1;
+    updateEvidence();
+  });
+}
+
+function updateEvidence() {
+  document.getElementById('ghost_shy').value = shy
+    ? 'Shy Ghost (alone)'
+    : 'Extrovert Ghost (everyone)';
+
+  for (var evidence of Object.keys(evidenceSelections)) {
+    var evidenceElement = document.getElementById(`evidence_${evidence}`);
+    if (evidenceSelections[evidence] === 1) {
+      evidenceElement.classList.add('selected');
+      evidenceElement.classList.remove('disabled');
+      for (var ghostEvidence of document.getElementsByClassName(evidence))
+        ghostEvidence.classList.add('selected');
+    } else if (evidenceSelections[evidence] === -1) {
+      evidenceElement.classList.remove('selected');
+      evidenceElement.classList.add('disabled');
+      for (var ghostEvidence of document.getElementsByClassName(evidence))
+        ghostEvidence.classList.remove('selected');
+    } else {
+      evidenceElement.classList.remove('selected');
+      evidenceElement.classList.remove('disabled');
+      for (var ghostEvidence of document.getElementsByClassName(evidence))
+        ghostEvidence.classList.remove('selected');
+    }
+  }
+
+  var enableRemovingGhosts = false;
+  var enabledEvidence = [];
+  var disabledEvidence = [];
+  for (var i of Object.keys(evidenceSelections)) {
+    if (evidenceSelections[i] !== 0) enableRemovingGhosts = true;
+    if (evidenceSelections[i] === 1) enabledEvidence.push(i);
+    if (evidenceSelections[i] === -1) disabledEvidence.push(i);
+  }
+
+  for (var ghost of document.getElementsByClassName('ghost')) {
+    if (!enableRemovingGhosts) {
+      ghost.classList.remove('disabled');
+      continue;
+    }
+    var ghostType = ghosts[ghost.id];
+    var disabled = false;
+    for (var ev of ghostType.evidence) if (disabledEvidence.includes(ev)) disabled = true;
+    if (disabled) {
+      ghost.classList.add('disabled');
+      continue;
+    }
+    var hasAllEnabled = true;
+    for (var enEv of enabledEvidence) if (!ghostType.evidence.includes(enEv)) hasAllEnabled = false;
+    if (disabled || !hasAllEnabled) {
+      ghost.classList.add('disabled');
+    } else {
+      ghost.classList.remove('disabled');
+    }
+  }
+  updatePossibleEvidence();
+}
+
+function updatePossibleEvidence() {
+  var ghostList = Array.from(document.getElementsByClassName('ghost'));
+  var evidenceList = document.getElementsByClassName('evidence-list')[0];
+  var possibleEvidence = [];
+  ghostList = ghostList.filter((ghost) => {
+    return !ghost.classList.contains('disabled');
+  });
+  for (var ghost of ghostList) {
+    var ghostType = ghosts[ghost.id];
+    for (var ev of ghostType.evidence)
+      if (!possibleEvidence.includes(ev) && evidenceSelections[ev] === 0) possibleEvidence.push(ev);
+  }
+  evidenceList.innerHTML = possibleEvidence
+    .map((v) => {
+      v = evidenceTypes[v];
+      return v;
+    })
+    .join(', ');
+}
+
+function reset() {
+  shy = true;
+  for (var ev of Object.keys(evidenceSelections)) evidenceSelections[ev] = 0;
+  updateEvidence();
+
+  var ghostName = document.getElementById('ghost_name');
+  ghostName.value = '';
 }
 
 function hideOther() {
@@ -133,7 +264,18 @@ function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+
+function downloadURI(uri, name) {
+  var link = document.createElement('a');
+  link.setAttribute('download', name);
+  link.href = uri;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 (() => {
+  addEvidenceTypes();
   addGhostTypes();
   hideOther();
   document.getElementById('ghost_tips').addEventListener('click', () => {
@@ -141,4 +283,5 @@ function capitalizeFirstLetter(string) {
     if (showTips) showOther();
     else hideOther();
   });
+  updatePossibleEvidence();
 })();
