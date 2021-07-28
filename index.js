@@ -84,6 +84,16 @@ const ghosts = {
     strengths: 'Can move objects at great speed and are more active when people are near',
     weaknesses: 'Being more active makes it easier to find and identify',
   },
+  hantu: {
+    evidence: ['fingers', 'orb', 'writing'],
+    strengths: 'Faster in cold areas',
+    weaknesses: 'Slow in warmer areas',
+  },
+  yokai: {
+    evidence: ['box', 'orb', 'writing'],
+    strengths: 'Talking near it will anger it',
+    weaknesses: 'While hunting, it can only hear voices close to it',
+  },
 };
 
 function changeShyness() {
