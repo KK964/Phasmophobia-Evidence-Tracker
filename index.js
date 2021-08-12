@@ -25,6 +25,7 @@ const ghosts = {
     evidence: ['box', 'fingers', 'writing'],
     strengths: 'Nothing',
     weaknesses: 'Smudge Sticks',
+    other: 'Footstep sound timer is 2-15s where as other ghosts have a timer of 15-45s',
   },
   wraith: {
     evidence: ['fingers', 'freezing', 'box'],
